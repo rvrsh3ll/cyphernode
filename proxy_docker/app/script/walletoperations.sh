@@ -87,6 +87,11 @@ spend() {
   else
     local message=$(echo "${response}" | jq -e ".error.message")
     if [ -n "${message}" ]; then
+      if [ "${message}" = "Insufficient funds" ]; then
+        trace "[spend] mosquitto_pub -h broker -t insufficientfunds -m \"{\"method\":\"batchspend\",\"error\":\"${errorstring}\"}\""
+        mosquitto_pub -h broker -t insufficientfunds -m "{\"method\":\"batchspend\",\"error\":\"${errorstring}\"}"
+      fi
+
       data="{\"message\":${message}}"
     else
       data="{\"message\":null}"
